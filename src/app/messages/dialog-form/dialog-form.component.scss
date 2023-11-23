@@ -1,0 +1,25 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dialogC {
+    position: relative !important;
+  }
+  
+  .close-icon {
+    align-self: flex-end;
+  }
+  .mat-form-field {
+    width: 100%;
+  }
+  .error{
+    color: #f44336;
+  }
+
+  .example-button-row{
+    width: 100%;
+    justify-content: space-between;
+    display: flex;
+  }

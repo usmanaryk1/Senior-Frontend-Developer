@@ -1,0 +1,32 @@
+<ng-container [formGroup]="messageForm">
+    <!-- <mat-dialog-content>
+        
+    </mat-dialog-content> -->
+    <mat-spinner *ngIf="spiner" [diameter]="'30'"></mat-spinner>
+    <button mat-mini-fab class="close-icon" [mat-dialog-close]="true">
+        <mat-icon>close</mat-icon>
+    </button>
+
+    <mat-divider></mat-divider>
+    <h2 mat-dialog-title>Message</h2>
+    <mat-form-field appearance="fill">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name">
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+        <mat-label>Message</mat-label>
+        <textarea matInput rows="4" formControlName="message"></textarea>
+    </mat-form-field>
+    <h2 class="error">{{error}}</h2>
+
+    <div class="example-button-row">
+        <button mat-raised-button [disabled]="messageForm.invalid || spiner" color="accent" (click)="submit()"
+            type="submit">
+            Sumbit</button>
+        <button mat-raised-button color="accent" (click)="reset()">
+            <mat-icon>cached</mat-icon></button>
+    </div>
+
+
+
+</ng-container>
