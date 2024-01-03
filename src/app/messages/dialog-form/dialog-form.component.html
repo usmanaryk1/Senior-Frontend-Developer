@@ -11,15 +11,15 @@
     <h2 mat-dialog-title>Message</h2>
     <mat-form-field appearance="fill">
         <mat-label>Name</mat-label>
-        <input matInput formControlName="name">
+        <input matInput formControlName="name" >
     </mat-form-field>
     <mat-form-field appearance="fill">
         <mat-label>Message</mat-label>
-        <textarea matInput rows="4" formControlName="message"></textarea>
+        <textarea matInput rows="4" formControlName="message" ></textarea>
     </mat-form-field>
     <h2 class="error">{{error}}</h2>
 
-    <div class="example-button-row">
+    <div class="example-button-row" *ngIf="!detail">
         <button mat-raised-button [disabled]="messageForm.invalid || spiner" color="accent" (click)="submit()"
             type="submit">
             Sumbit</button>

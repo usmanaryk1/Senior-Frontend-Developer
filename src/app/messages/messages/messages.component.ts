@@ -20,7 +20,8 @@ import {MatPaginatorModule,MatPaginator} from '@angular/material/paginator';
 
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Observable } from 'rxjs';
+import { Observable, catchError, tap, throwError } from 'rxjs';
+import { MessagesService } from 'src/app/service/messages.service';
 
 
 @Component({
@@ -50,10 +51,12 @@ export class MessagesComponent implements OnInit {
     // showLoading$!:Observable<boolean>;
 
 
-  constructor(public dialog: MatDialog
+  constructor(
+    public dialog: MatDialog,
+    private _messagesService: MessagesService
     ) {      
    }
-  displayedColumns: string[] = ['ID', 'Name', 'Message', 'Date'];
+  displayedColumns: string[] = ['ID', 'Name', 'Message', 'Date', 'Action'];
   dataSource: any;
   spiner: boolean = true;
  public messageText:string;
@@ -64,21 +67,30 @@ export class MessagesComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   ngOnInit(): void {
+    this.refreshData();
 
     // this._messagesService.gets().subscribe(msgs => {
-    //   this.dataSource = new MatTableDataSource<Message>(msgs);
+    //   this.dataSource = new MatTableDataSource<any>(msgs);
     //   this.dataSource.paginator = this.paginator;
     //   this.spiner = false;
     // })
   }
 
-  openDialog(): void {
-    this.dialog.open(DialogFormComponent, {
-      height: '400px',
-      width: '600px',
-      panelClass: 'dialogC',
-    });
-  }
+// Add a parameter to receive data in the openDialog method
+openDialog(messageDetails: any, detail:boolean): void {
+  const dialogRef = this.dialog.open(DialogFormComponent, {
+    height: '400px',
+    width: '600px',
+    panelClass: 'dialogC',
+    // Pass the data to the dialog
+    data: { messageDetails: messageDetails , detail: detail}
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    console.log('The dialog was closed');
+    this.refreshData(); // Refresh data after dialog close
+  });
+}
 
   openMsgDialog(msg:string): void {
     this.dialog.open(MessageDialog, {
@@ -87,6 +99,53 @@ export class MessagesComponent implements OnInit {
       },
     });
   }
+
+  delete(msg: any): void {
+    const isConfirmed = window.confirm('Are you sure you want to delete this message?');
+    if (isConfirmed) {
+      this._messagesService.delete(msg._id)
+        .pipe(
+          tap(() => console.log('Message deleted successfully')),
+          catchError(error => {
+            console.error('Error deleting message:', error);
+            return throwError(error);
+          })
+        )
+        .subscribe(() => {
+          this.refreshData(); // Refresh data after deletion
+        });
+    }
+  }
+
+  update(msg:any) {
+    console.log("update",msg);
+    this._messagesService.getMessageById(msg._id).subscribe(msg => {
+      console.log("update by id", msg);
+      // Open the dialog and pass the message details as data
+      this.openDialog(msg, false);
+    })
+
+  }
+
+  details(msg:any, detail:boolean) {
+    console.log("details",msg);
+    this._messagesService.getMessageById(msg._id).subscribe(msg => {
+      console.log("details by id", msg);
+      // Open the dialog and pass the message details as data
+      this.openDialog(msg, detail);
+    })
+
+  }
+
+  private refreshData(): void {
+    this.dataSource = this._messagesService.gets();
+    this.dataSource.subscribe((msgs:any) => {
+      this.dataSource = new MatTableDataSource<any>(msgs);
+      this.dataSource.paginator = this.paginator;
+      this.spiner = false;
+    });
+  }
+
 }
 
 @Component({
